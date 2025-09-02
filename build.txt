@@ -1,3 +1,0 @@
-displayName = Saria Summon Mod!
-author = ~David~
-version = 8.0.3
