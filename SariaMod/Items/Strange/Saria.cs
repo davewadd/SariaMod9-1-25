@@ -645,26 +645,12 @@ namespace SariaMod.Items.Strange
                     }
                     if (player.moveSpeed <= 5)
                     {
-                        // Check distances in descending order.
-                        int[] checkDistances = { 50, 40, 30, 20, 10 };
-                        bool foundPosition = false;
-                        foreach (int distance in checkDistances)
-                        {
-                            if (Projectile.NewIdlePosition(distance))
-                            {
-                                Close = distance;
-                                foundPosition = true;
-                                break; // Stop once a valid position is found.
-                            }
-                        }
-                        // If no valid position from the loop, handle the default case.
-                        if (!foundPosition)
-                        {
-                            if (Projectile.NewIdlePosition(0) || player.ownedProjectileCounts[ModContent.ProjectileType<Emeraldspike>()] > 0f || player.ownedProjectileCounts[ModContent.ProjectileType<Emeraldspike2>()] > 0f || player.ownedProjectileCounts[ModContent.ProjectileType<Emeraldspike3>()] > 0f)
-                            {
-                                Close = 0;
-                            }
-                        }
+                        if (!Projectile.NewIdlePosition(50) && Projectile.NewIdlePosition(40)) { Close = 40; }
+                        else if (!Projectile.NewIdlePosition(40) && Projectile.NewIdlePosition(30)) { Close = 30; }
+                        else if (!Projectile.NewIdlePosition(30) && Projectile.NewIdlePosition(20)) { Close = 20; }
+                        else if (!Projectile.NewIdlePosition(20) && Projectile.NewIdlePosition(10)) { Close = 10; }
+                        else if (!Projectile.NewIdlePosition(10) && Projectile.NewIdlePosition(0)) { Close = 0; }
+                        else if (!Projectile.NewIdlePosition(0) || (player.ownedProjectileCounts[ModContent.ProjectileType<Emeraldspike>()] > 0f) || (player.ownedProjectileCounts[ModContent.ProjectileType<Emeraldspike2>()] > 0f) || (player.ownedProjectileCounts[ModContent.ProjectileType<Emeraldspike3>()] > 0f)) { Close = 0; }
                     }
                 }
                 float minionPositionOffsetX = ((Close + Projectile.minionPos / 80) * player.direction);
@@ -755,16 +741,29 @@ namespace SariaMod.Items.Strange
                         if (Main.myPlayer == Projectile.owner) Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.position.X + 0, Projectile.position.Y + -24, 0, 0, ModContent.ProjectileType<Sad>(), (int)(Projectile.damage), 0f, Projectile.owner, player.whoAmI, Projectile.whoAmI);
                     }
                 }
-                float positiveThreshold = Projectile.NewIdlePosition(51) ? 0.25f : 1.25f;
-                float negativeThreshold = Projectile.NewIdlePosition(51) ? -0.25f : -1.25f;
-                if (Projectile.velocity.X >= positiveThreshold)
+                if (Projectile.NewIdlePosition(51))
                 {
-                    Projectile.spriteDirection = 1;
+                    if (Projectile.velocity.X >= 0.25)
+                    {
+                        Projectile.spriteDirection = 1;
+                    }
+                    if (Projectile.velocity.X <= -0.25)
+                    {
+                        Projectile.spriteDirection = -1;
+                    }
                 }
-                else if (Projectile.velocity.X <= negativeThreshold)
+                else if (!Projectile.NewIdlePosition(51))
                 {
-                    Projectile.spriteDirection = -1;
+                    if (Projectile.velocity.X >= 1.25)
+                    {
+                        Projectile.spriteDirection = 1;
+                    }
+                    if (Projectile.velocity.X <= -1.25)
+                    {
+                        Projectile.spriteDirection = -1;
+                    }
                 }
+               
                 if (Projectile.frame == 65 && Sleep && MoveTimer >= 550)
                 {
                     Projectile.SneezeDust(ModContent.DustType<Z>(), 40, 1, -10, 3, -12);
